@@ -1,0 +1,218 @@
+/*******************************************************************************************
+  SIMPL+ Module Information
+  (Fill in comments below)
+*******************************************************************************************/
+/*
+Dealer Name:
+System Name:
+System Number:
+Programmer:
+Comments:
+*/
+
+/*******************************************************************************************
+  Compiler Directives
+  (Uncomment and declare compiler directives as needed)
+*******************************************************************************************/
+// #ENABLE_DYNAMIC
+// #SYMBOL_NAME ""
+// #HINT ""
+// #DEFINE_CONSTANT
+// #CATEGORY "" 
+// #PRINT_TO_TRACE
+// #DIGITAL_EXPAND 
+// #ANALOG_SERIAL_EXPAND 
+// #OUTPUT_SHIFT 
+// #HELP_PDF_FILE ""
+#DEFAULT_VOLATILE
+#ENABLE_STACK_CHECKING
+#ENABLE_TRACE
+// #ENCODING_ASCII
+// #ENCODING_UTF16
+// #ENCODING_INHERIT_FROM_PARENT
+// #ENCODING_INHERIT_FROM_PROGRAM
+/*
+#HELP_BEGIN
+   (add additional lines of help lines)
+#HELP_END
+*/
+
+DIGITAL_INPUT	Update,
+				_SKIP_,
+				Commit,
+				_SKIP_;
+
+ANALOG_INPUT	New_Group_Count;
+
+STRING_INPUT	New_Room_Name$[32],
+				_SKIP_,
+				New_Group_Name$[16][32];
+
+DIGITAL_OUTPUT	file_access_busy,
+				_SKIP_;
+
+ANALOG_OUTPUT	number_of_groups,
+				_SKIP_;
+
+STRING_OUTPUT	Room_Name$,
+				_SKIP_;
+
+STRING_OUTPUT	Group_Name$[16];
+
+integer StartPosition, StopPosition, status, dataLength, users_defined, groupCount;
+signed_integer FileHandle, TotalBytesWritten;
+string tagstart[32], tagstop[32], tempData$[4096], roomName$[32], groupName$[16][32], XML_data$[8192];
+
+STRING_FUNCTION parseXML(string currentData$, string tag$)
+{
+	string parseData$[4096];
+
+	makestring(tagstart,"<%s>",tag$);
+    makestring(tagstop, "</%s>",tag$);
+	
+	StartPosition = find(tagstart, currentData$);
+ 	StopPosition = find(tagstop, currentData$, (StartPosition + len(tagstart)));
+
+	parseData$ = remove(tagstop, currentData$, StartPosition);
+
+	if((StartPosition > 0) && (StopPosition > StartPosition))
+		return(mid(parseData$, (StartPosition + len(tagstart)), (StopPosition - StartPosition - len(tagstart))));
+	else
+		return("");
+}
+
+STRING_FUNCTION writeXML()
+{
+	XML_data$ =	"<?xml version=\x221.0\x22?>\x0D" +
+				"<RoomConfiguration>\x0D" +
+				"\x09<RoomSettings>\x0D" +
+				"\x09\x09<Name>" + roomName$ + "</Name>\x0D" +
+				"\x09</RoomSettings>\x0D" +
+				"\x09<GroupSettings>\x0D" +
+				"\x09\x09<Total>" + itoa(groupCount) + "</Total>\x0D" +
+				"\x09\x09<Group1Name>" + groupName$[1] + "</Group1Name>\x0D" +
+				"\x09\x09<Group2Name>" + groupName$[2] + "</Group2Name>\x0D" +
+				"\x09\x09<Group3Name>" + groupName$[3] + "</Group3Name>\x0D" +
+				"\x09\x09<Group4Name>" + groupName$[4] + "</Group4Name>\x0D" +
+				"\x09\x09<Group5Name>" + groupName$[5] + "</Group5Name>\x0D" +
+				"\x09\x09<Group6Name>" + groupName$[6] + "</Group6Name>\x0D" +
+				"\x09\x09<Group7Name>" + groupName$[7] + "</Group7Name>\x0D" +
+				"\x09\x09<Group8Name>" + groupName$[8] + "</Group8Name>\x0D" +
+				"\x09\x09<Group9Name>" + groupName$[9] + "</Group9Name>\x0D" +
+				"\x09\x09<Group10Name>" + groupName$[10] + "</Group10Name>\x0D" +
+				"\x09\x09<Group11Name>" + groupName$[11] + "</Group11Name>\x0D" +
+				"\x09\x09<Group12Name>" + groupName$[12] + "</Group12Name>\x0D" +
+				"\x09\x09<Group13Name>" + groupName$[13] + "</Group13Name>\x0D" +
+				"\x09\x09<Group14Name>" + groupName$[14] + "</Group14Name>\x0D" +
+				"\x09\x09<Group15Name>" + groupName$[15] + "</Group15Name>\x0D" +
+				"\x09\x09<Group16Name>" + groupName$[16] + "</Group16Name>\x0D" +
+				"\x09</GroupSettings>\x0D" +
+				"</RoomConfiguration>";				
+}	
+
+CHANGE New_Room_Name$
+{
+	roomName$ = New_Room_Name$;
+	Room_Name$ = roomName$;
+}
+
+CHANGE New_Group_Name$
+{
+	integer index;
+
+	index = getlastmodifiedarrayindex();
+
+	groupName$[index] = New_Group_Name$[index];
+
+	Group_Name$[index] = groupName$[index];
+}
+
+CHANGE New_Group_Count
+{
+	groupCount = New_Group_Count;
+	number_of_groups = groupCount;
+}	
+
+PUSH Commit
+{
+	integer fLength;
+
+	file_access_busy = 1;
+
+	WriteXML();
+
+	fLength = len(XML_data$);
+
+	StartFileOperations();
+
+	FileHandle = FileOpen("\\NVRAM\\names.xml", _O_WRONLY | _O_TEXT);
+
+	if(FileHandle >= 0)
+	{
+		FileWrite(FileHandle, XML_data$, fLength);
+	}
+	else
+	{
+		GenerateUserError("Error opening file for write.\n");
+	}
+
+	FileClose(FileHandle);    
+
+	EndFileOperations();
+
+	file_access_busy = 0;
+}
+
+PUSH Update
+{
+	integer x;
+	string sBuf[4096], dynamicTag[256];
+
+	file_access_busy = 1;
+
+	StartFileOperations();
+
+    FileHandle = FileOpen("\\NVRAM\\names.xml", _O_RDONLY | _O_TEXT);
+
+	if(FileHandle >= 0)
+	{
+		FileRead(FileHandle, sBuf, 8192);
+		
+		while(find("</RoomSettings>", sBuf))
+		{
+			tempData$ = remove("</RoomSettings", sBuf);
+			roomName$ = parseXML(tempData$, "Name");
+			Room_Name$ = roomName$;
+		}
+
+		while(find("</GroupSettings>", sBuf))
+		{
+			tempData$ = remove("</GroupSettings", sBuf);
+			groupCount = atoi(parseXML(tempData$, "Total"));
+            number_of_groups = groupCount;
+
+			for(x=1 to 16)
+			{
+				dynamicTag = "Group" + itoa(x) + "Name";
+				groupName$[x] = parseXML(tempData$, dynamicTag);
+				Group_Name$[x] = groupName$[x];
+			}
+		}
+	}
+	else
+	{
+		GenerateUserError("Error opening file for read.\n");
+	}
+
+	FileClose(FileHandle);    
+
+	EndFileOperations();
+
+	file_access_busy = 0;
+}
+
+Function Main()
+{
+	file_access_busy = 0;
+	waitforinitializationcomplete();
+}

@@ -1,0 +1,495 @@
+/*
+Dealer Name: Riordan Brothers
+Programmer: Hope Roth
+Comments:
+*/
+
+#SYMBOL_NAME "RBI 2-Series System Helper Splus v1b"
+// #HINT ""
+// #CATEGORY "" 
+
+#DEFAULT_VOLATILE
+#ENABLE_STACK_CHECKING
+#ENABLE_TRACE
+
+/* Constants */
+
+#DEFINE_CONSTANT delim ","
+#DEFINE_CONSTANT max_zones 12
+
+/*
+#HELP_BEGIN
+   (add additional lines of help lines)
+#HELP_END
+*/
+
+
+DIGITAL_INPUT settings_save, settings_recall,_SKIP_, AV_enable, AV_disable, _SKIP_, zone_enable[max_zones], zone_disable[max_zones], zone_dimmable[max_zones], zone_switched[max_zones], PC_enable[max_zones], PC_disable[max_zones]; 
+ANALOG_INPUT system_pc_type_set, motion_type_set, motion_timeout_set, zone_PC_status_set[max_zones];
+
+DIGITAL_OUTPUT settings_saved_fb, settings_updated_fb,_SKIP_, AV_enable_fb, _SKIP_, _SKIP_, zone_enable_fb[max_zones], zone_dimmable_fb[max_zones], PC_enable_fb[max_zones];
+ANALOG_OUTPUT system_pc_type_fb, motion_type_fb, motion_timeout_fb, keypad_type_fb, zone_PC_status_fb[max_zones];
+
+STRING_PARAMETER helperID[50];
+STRING_PARAMETER file_path[50];
+
+FILE_INFO nFileInfo;
+
+SIGNED_INTEGER nFileHandle;
+SIGNED_INTEGER nFileFound;
+SIGNED_INTEGER iErrorCode; 
+ 
+INTEGER three_series; 
+INTEGER StartPosition, StopPosition;
+
+INTEGER AllowData;
+INTEGER SaveWaitTime;
+INTEGER SaveWaitActive;
+
+
+STRING sBuf[20000];
+STRING file_contents[20000];
+STRING file_line[256];
+STRING str[50];
+string tagstart[32], tagstop[32];
+string tempString$[256];
+string tempData$[4096];
+
+string tempTag[50];
+string tempTagContents[50];
+ 
+
+STRING_FUNCTION get_full_path()
+{
+	string full_path[255];
+
+    if(three_series)
+	{	  
+		MAKESTRING (full_path, "%s\\%s.xml", file_path, helperID); //create our full path for reading and saving
+    }
+
+	else
+	{
+        MAKESTRING (full_path, "%s\\%s.xml", file_path, helperID); //create our full path for reading and saving
+	}
+
+	return (full_path);
+}
+
+STRING_FUNCTION parseXML(string currentData$, string tag$)
+{
+	string parseData$[4096];
+
+	makestring(tagstart,"<%s>",tag$);
+    makestring(tagstop, "</%s>",tag$);
+	
+	StartPosition = find(tagstart, currentData$);
+ 	StopPosition = find(tagstop, currentData$, (StartPosition + len(tagstart)));
+
+	parseData$ = remove(tagstop, currentData$, StartPosition);
+
+	if((StartPosition > 0) && (StopPosition > StartPosition))
+		return(mid(parseData$, (StartPosition + len(tagstart)), (StopPosition - StartPosition - len(tagstart))));
+	else
+		return("");
+}
+
+FUNCTION sync_in_to_out()
+{
+	integer i;
+
+	system_pc_type_fb = system_pc_type_set;
+	motion_type_fb = motion_type_set;
+	motion_timeout_fb = motion_timeout_set;
+	
+ 	for (i = 1 to max_zones)
+	{
+		zone_PC_status_fb[i] = zone_PC_status_set[i];
+	}
+
+}
+
+STRING_FUNCTION MakeXML()
+{
+	string returnData[5000];
+	integer i;
+
+	returnData = "<?xml version=\x221.0\x22?>\x0D" +
+				"<SystemConfiguration-" + helperID + ">\x0D"
+				+"<SystemPC>" + itoa(system_pc_type_set) + "</SystemPC>\x0D"
+				+"<MotionType>"+ itoa(motion_type_set) + "</MotionType>\x0D"
+				+"<MotionTimeout>"+ itoa(motion_timeout_set) + "</MotionTimeout>\x0D"
+				+"<AV_Enable>"+ itoa(AV_enable_fb) + "</AV_Enable>\x0D"
+				+"<Keypad_Type>"+ itoa(keypad_type_fb) + "</Keypad_Type>\x0D"	;
+
+
+		FOR (i = 1 to max_zones) //zone enable
+		{
+			MAKESTRING(file_line, "<Zone%02u_Enable>%u</Zone%02u_Enable>\x0D", i, zone_enable_fb[i], i); //create zone enable string
+			returnData = returnData + file_line;
+		}
+
+		FOR (i = 1 to max_zones) //zone dimmable
+		{
+			MAKESTRING(file_line, "<Zone%02u_Dimmable>%u</Zone%02u_Dimmable>\x0D", i, zone_dimmable_fb[i], i); //create zone dimmable string
+			returnData = returnData + file_line;
+		}
+
+		FOR (i = 1 to max_zones)//PC type
+		{
+			MAKESTRING(file_line, "<Zone%02uPC>%u</Zone%02uPC>\x0D", i, zone_PC_status_set[i], i); //create zone PC type string
+			returnData = returnData + file_line;
+		}
+
+
+		FOR (i = 1 to max_zones) //PC enable
+		{
+			MAKESTRING(file_line, "<Zone%02uPC_Enable>%u</Zone%02uPC_Enable>\x0D", i, PC_enable_fb[i], i); //create zone PC enable string
+			returnData = returnData + file_line;
+		}
+
+       returnData = returnData + "</SystemConfiguration-" + helperID + ">\x0D";
+
+	return (returnData);
+}
+
+FUNCTION set_defaults()
+{
+	integer i;
+
+ 	for (i = 1 to max_zones) //set all zones to enabled and dimmable
+	{
+		zone_enable_fb[i]= 1;
+		zone_dimmable_fb[i] = 1;
+	}
+}
+
+FUNCTION init_settings()
+{
+  	integer i;
+	string full_path[255];
+
+	full_path = get_full_path();
+
+	StartFileOperations(); //we're going to be reading and writing files
+          
+ 	if (three_series=1)
+		{
+           nFileFound = FindFirstShared(full_path, nFileInfo); //look for our file
+         }
+	else
+	{		
+		nFileFound = FindFirst(full_path, nFileInfo); //look for our file
+     }
+
+	IF (nFileFound < 0){ //if file not found
+
+        GenerateUserNotice ("Creating New Settings File: %s \n", full_path); //log that we're creating a new file
+
+			if (three_series=1)
+			{
+				nFileHandle = FileOpenShared(full_path, _O_CREAT | _O_TEXT | _O_WRONLY); //create new file that we can write to
+            }
+		
+	 
+			else 
+			{
+				nFileHandle = FileOpen(full_path, _O_CREAT | _O_TEXT | _O_WRONLY); //create new file that we can write to
+        	}                   
+               
+
+		set_defaults(); //set default values
+		sBuf = MakeXML();
+		FileWrite(nFileHandle, sBuf, len(sBuf)); //add string to our file
+		FileClose(nFileHandle); //done with our file, so close it
+	}
+
+	ELSE
+	{
+        if (three_series=1)
+     	{
+		nFileHandle = FileOpenShared(full_path, _O_TEXT | _O_RDONLY); //file exists, so let's read from it
+        }
+
+		else  
+        {
+		nFileHandle = FileOpen(full_path, _O_TEXT | _O_RDONLY); //file exists, so let's read from it
+        }
+
+
+		IF (nFileHandle < 0) //if some  file error, log it
+		{
+		GenerateUserError("Error Opening: %s, Error Code: %u\n", full_path, nFileHandle);
+		FileClose(nFileHandle); //done with our file, so close it
+    	}
+
+
+		ELSE
+		{
+
+       	iErrorCode = Fileread(nFileHandle, file_contents, 20000); // read in our file contents
+
+
+		if (iErrorCode<0){
+          GenerateUserError("Error Reading File, Error Code: %u\n", iErrorCode);
+		}
+         
+			tempData$ = remove("</SystemPC>", file_contents);
+			tempString$ = parseXML(tempData$, "SystemPC");
+			system_pc_type_fb = atoi(tempString$);	
+
+			tempData$ = remove("</MotionType>", file_contents);
+			tempString$ = parseXML(tempData$, "MotionType");
+			motion_type_fb = atoi(tempString$);
+
+			tempData$ = remove("</MotionTimeout>", file_contents);
+			tempString$ = parseXML(tempData$, "MotionTimeout");
+			motion_timeout_fb = atoi(tempString$);
+
+
+			tempData$ = remove("</AV_Enable>", file_contents);
+			tempString$ = parseXML(tempData$, "AV_Enable");
+			av_enable_fb = atoi(tempString$);
+
+			tempData$ = remove("</Keypad_Type>", file_contents);
+			tempString$ = parseXML(tempData$, "Keypad_Type");
+			keypad_type_fb = atoi(tempString$);
+             
+			for (i = 1 to max_zones)
+			{
+				makestring(TempTag, "</Zone%02u_Enable>", i);
+				makestring (TempTagContents, "Zone%02u_Enable", i);
+
+				tempData$ = remove(TempTag, file_contents);
+				tempString$ = parseXML(tempData$, TempTagContents);
+				zone_enable_fb[i] = atoi(tempString$);
+			}
+
+			for (i = 1 to max_zones)
+			{
+				makestring(TempTag, "</Zone%02u_Dimmable>", i);
+				makestring (TempTagContents, "Zone%02u_Dimmable", i);
+
+				tempData$ = remove(TempTag, file_contents);
+				tempString$ = parseXML(tempData$, TempTagContents);
+				zone_dimmable_fb[i] = atoi(tempString$);
+			}
+
+			for (i = 1 to max_zones)
+			{
+				makestring(TempTag, "</Zone%02uPC>", i);
+				makestring (TempTagContents, "Zone%02uPC", i);
+
+				tempData$ = remove(TempTag, file_contents);
+				tempString$ = parseXML(tempData$, TempTagContents);
+				zone_PC_status_fb[i] = atoi(tempString$);
+			}
+
+			for (i = 1 to max_zones)
+			{
+				makestring(TempTag, "</Zone%02uPC_Enable>", i);
+				makestring (TempTagContents, "Zone%02uPC_Enable", i);
+
+				tempData$ = remove(TempTag, file_contents);
+				tempString$ = parseXML(tempData$, TempTagContents);
+				PC_enable_fb[i] = atoi(tempString$);
+			}
+
+             PULSE (25, settings_updated_fb);
+             FileClose(nFileHandle); //done with our file, so close it
+		
+		} //else
+	
+	}//else
+
+	EndFileOperations(); //we're done with file operations
+
+	AllowData = 1;
+}
+
+FUNCTION invoke_settings_init()
+{
+	init_settings();
+}
+
+
+FUNCTION save_settings()
+{
+    integer i;
+    string full_path[255];
+	full_path = get_full_path(); //create our full path for reading and saving
+	
+	StartFileOperations();
+
+	if(three_series=1)
+	{	
+	nFileHandle = FileOpenShared(full_path, _O_TEXT | _O_CREAT | _O_WRONLY |_O_TRUNC); //open file for writing
+    }
+
+	else
+	{	
+	nFileHandle = FileOpen(full_path, _O_TEXT | _O_CREAT | _O_WRONLY |_O_TRUNC); //open file for writing
+    }
+
+	IF (nFileHandle<0)
+	{ 
+		GenerateUserError("Error Opening: %s, Error Code: %u \n", full_path, nFileHandle);
+	}
+
+	ELSE
+	{
+		sBuf = MakeXML();
+
+		iErrorCode = FileWrite(nFileHandle, sBuf, len(sBuf)); //add string to our file 	
+
+            	if (iErrorCode < 0)
+				{
+     				GenerateUserError("Error Saving To: %s, Error Code: %u \n", full_path, nFileHandle);
+				}
+	}	 
+
+	if (iErrorCode >= 0)
+	{
+		PULSE (25, settings_saved_fb);
+		sync_in_to_out();
+	}
+       
+
+	FileClose(nFileHandle); //done with our file, so close it
+	EndFileOperations();
+}
+     
+
+FUNCTION generate_save()
+{
+	if (SaveWaitActive<>1)
+	{
+		SaveWaitActive = 1;
+
+		WAIT(SaveWaitTime, SaveWait)
+		{
+            save_settings();
+			SaveWaitActive = 0;
+		}
+	}
+
+	else
+		{
+             RETIMEWAIT(SaveWaitTime, SaveWait);
+		}
+}
+
+PUSH settings_recall
+{
+	if (AllowData)
+	{
+		init_settings();
+	}
+}		
+
+PUSH settings_save
+{
+	generate_save();
+
+}
+
+PUSH AV_enable
+{
+ 	AV_enable_fb = 1;
+	generate_save();
+}
+
+PUSH AV_disable
+{
+ 	AV_enable_fb = 0;
+	generate_save();
+}
+
+PUSH zone_enable
+{
+ 	integer i;
+	i = getlastmodifiedarrayindex(); //which zone is this?
+
+
+	zone_enable_fb[i] = 1; //enable goes high
+	generate_save(); //save new setting
+}
+
+PUSH zone_disable
+{
+ 	integer i;
+	i = getlastmodifiedarrayindex(); //which zone is this?
+
+
+	zone_enable_fb[i] = 0; //enable goes low
+	generate_save(); //save new setting
+}
+
+PUSH zone_dimmable
+{
+ 	integer i;
+	i = getlastmodifiedarrayindex(); //which zone is this?
+
+
+	zone_dimmable_fb[i] = 1; //dimmable goes high
+	generate_save(); //save new setting
+}
+
+PUSH zone_switched
+{
+ 	integer i;
+	i = getlastmodifiedarrayindex(); //which zone is this?
+
+
+	zone_dimmable_fb[i] = 0; //dimmable goes low
+	generate_save(); //save new setting
+}
+
+
+PUSH PC_enable
+{
+ 	integer i;
+	i = getlastmodifiedarrayindex(); //which zone is this?
+
+	PC_enable_fb[i] = 1; //enable goes high
+	generate_save(); //save new setting
+}
+
+PUSH PC_disable
+{
+ 	integer i;
+	i = getlastmodifiedarrayindex(); //which zone is this?
+
+
+	PC_enable_fb[i] = 0; //enable goes low
+	generate_save(); //save new setting
+}
+  
+CHANGE motion_timeout_set
+{
+	if (motion_timeout_set>0 && motion_timeout_set <> motion_timeout_fb)// don't let this get zero'd out, new value
+	{	
+		generate_save(); //save new setting
+	} 
+}
+
+Function Main()
+{
+
+	AllowData = 0;
+	SaveWaitTime = 200;
+	SaveWaitActive = 0;
+	
+    WaitForInitializationComplete();
+
+	if (GetSeries()=3){
+        three_series = 1;
+		 }
+		   	
+    delay(1000);
+	
+	invoke_settings_init();   
+}
+
+
+

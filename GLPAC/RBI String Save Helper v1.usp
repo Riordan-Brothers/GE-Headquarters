@@ -1,0 +1,44 @@
+/*******************************************************************************************
+  SIMPL+ Module Information
+  (Fill in comments below)
+*******************************************************************************************/
+/*
+Dealer Name: Riordan Brothers
+System Name: Hope Roth
+System Number:
+Programmer:
+Comments:
+*/
+
+
+#DEFAULT_VOLATILE
+#ENABLE_STACK_CHECKING
+#ENABLE_TRACE
+
+#HELP_BEGIN
+   pulses a digital save if a serial changes, and the string isn't null
+
+#HELP_END
+
+
+STRING_INPUT str[255][50];
+
+DIGITAL_OUTPUT save_pulse;
+
+
+Threadsafe Change str
+{
+
+	integer i;
+	integer length;
+
+	i = getlastmodifiedarrayindex(); //which string changed?
+
+	length = len(str[i]); //find out how long the changed string is
+
+	if (length > 0) // make sure our string isn't empty
+    {
+		PULSE(50, save_pulse); //go ahead and save
+	}
+
+}
