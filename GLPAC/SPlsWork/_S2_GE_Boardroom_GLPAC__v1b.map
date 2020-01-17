@@ -1,0 +1,382 @@
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+ram              0x80000000         0x00500000         xrw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+                0x00000000                __DYNAMIC=0x0
+                0x00400000                PROVIDE (__stack, 0x400000)
+                0x00000000                PROVIDE (hardware_init_hook, 0x0)
+                0x00000000                PROVIDE (_hardware_init_hook, 0x0)
+                0x00000000                PROVIDE (software_init_hook, 0x0)
+                0x00000000                PROVIDE (_software_init_hook, 0x0)
+
+.text           0x80000000    0x14b00
+ *(.text)
+ .text          0x80000000     0x4640 S2_RBI_2_Series_System_Helper_Splus_v1b.o
+                0x800037e6                S2_RBI_2_Series_System_Helper_Splus_v1bEventHandler00008
+                0x80003924                S2_RBI_2_Series_System_Helper_Splus_v1bEventHandler00009
+                0x800032f2                S2_RBI_2_Series_System_Helper_Splus_v1bEventHandler00004
+                0x80003430                S2_RBI_2_Series_System_Helper_Splus_v1bEventHandler00005
+                0x8000440a                S2_RBI_2_Series_System_Helper_Splus_v1bEventHandler00002
+                0x8000425a                S2_RBI_2_Series_System_Helper_Splus_v1bSAVEWAIT
+                0x800036aa                S2_RBI_2_Series_System_Helper_Splus_v1bEventHandler00007
+                0x80004526                S2_RBI_2_Series_System_Helper_Splus_v1bEventHandler00003
+                0x80003e9a                S2_RBI_2_Series_System_Helper_Splus_v1b_main
+                0x800042b0                S2_RBI_2_Series_System_Helper_Splus_v1bEventHandler00000
+                0x80004316                S2_RBI_2_Series_System_Helper_Splus_v1bEventHandler00001
+                0x8000356c                S2_RBI_2_Series_System_Helper_Splus_v1bEventHandler00006
+                0x80003d80                S2_RBI_2_Series_System_Helper_Splus_v1b_EventHandler
+                0x80003a60                S2_RBI_2_Series_System_Helper_Splus_v1bEventHandler0000A
+ .text          0x80004640     0x2ece S2_SB_Names_Controller_v1_0.o
+                0x8000748c                S2_SB_Names_Controller_v1_0EventHandler00002
+                0x800066b4                S2_SB_Names_Controller_v1_0EventHandler00004
+                0x80006280                S2_SB_Names_Controller_v1_0EventHandler00001
+                0x800072fa                S2_SB_Names_Controller_v1_0_main
+                0x80006426                S2_SB_Names_Controller_v1_0EventHandler00003
+                0x800071aa                S2_SB_Names_Controller_v1_0_EventHandler
+                0x8000613a                S2_SB_Names_Controller_v1_0EventHandler00000
+ *fill*         0x8000750e        0x2
+ .text          0x80007510     0x1426 S2_RBI_Dynamic_Presets_Helper_v8.o
+                0x800088be                S2_RBI_Dynamic_Presets_Helper_v8EventHandler00001
+                0x800085d8                S2_RBI_Dynamic_Presets_Helper_v8_EventHandler
+                0x800086b8                S2_RBI_Dynamic_Presets_Helper_v8_main
+                0x80008044                S2_RBI_Dynamic_Presets_Helper_v8EventHandler00000
+ *fill*         0x80008936        0x2
+ .text          0x80008938     0x2fb4 S2_Photocell_Proportional_Control_v1_7.o
+                0x8000b62a                S2_Photocell_Proportional_Control_v1_7EventHandler00007
+                0x8000a488                S2_Photocell_Proportional_Control_v1_7EventHandler00004
+                0x8000b518                S2_Photocell_Proportional_Control_v1_7EventHandler00005
+                0x8000b38c                S2_Photocell_Proportional_Control_v1_7SAVEWAIT
+                0x8000b382                S2_Photocell_Proportional_Control_v1_7_AUTOLEVEL_Destructor
+                0x80009ce2                S2_Photocell_Proportional_Control_v1_7EventHandler00001
+                0x80009fe8                S2_Photocell_Proportional_Control_v1_7EventHandler00002
+                0x8000b378                S2_Photocell_Proportional_Control_v1_7_AUTOLEVEL_Constructor
+                0x8000ac04                S2_Photocell_Proportional_Control_v1_7EventHandler0000B
+                0x8000b5a0                S2_Photocell_Proportional_Control_v1_7EventHandler00006
+                0x8000a22c                S2_Photocell_Proportional_Control_v1_7EventHandler00003
+                0x8000a96a                S2_Photocell_Proportional_Control_v1_7EventHandler0000A
+                0x8000af56                S2_Photocell_Proportional_Control_v1_7_EventHandler
+                0x8000b414                S2_Photocell_Proportional_Control_v1_7EventHandler00000
+                0x8000b714                S2_Photocell_Proportional_Control_v1_7EventHandler00008
+                0x8000a6d0                S2_Photocell_Proportional_Control_v1_7EventHandler00009
+                0x8000b834                S2_Photocell_Proportional_Control_v1_7EventHandler0000C
+                0x8000b01e                S2_Photocell_Proportional_Control_v1_7_main
+ .text          0x8000b8ec      0xa7a S2_RBI_Motion_Logic_SPlus_v1c.o
+                0x8000b8ec                S2_RBI_Motion_Logic_SPlus_v1cEventHandler00000
+                0x8000bf1a                S2_RBI_Motion_Logic_SPlus_v1cEventHandler00002
+                0x8000c29a                S2_RBI_Motion_Logic_SPlus_v1cEventHandler00007
+                0x8000be08                S2_RBI_Motion_Logic_SPlus_v1c_main
+                0x8000bc30                S2_RBI_Motion_Logic_SPlus_v1c_EventHandler
+                0x8000ba3a                S2_RBI_Motion_Logic_SPlus_v1cEventHandler00001
+                0x8000c070                S2_RBI_Motion_Logic_SPlus_v1cEventHandler00004
+                0x8000bfc6                S2_RBI_Motion_Logic_SPlus_v1cEventHandler00003
+                0x8000bd30                S2_RBI_Motion_Logic_SPlus_v1cVACWAIT
+                0x8000c1d8                S2_RBI_Motion_Logic_SPlus_v1cEventHandler00006
+                0x8000c176                S2_RBI_Motion_Logic_SPlus_v1cEventHandler00005
+ *fill*         0x8000c366        0x2
+ .text          0x8000c368      0x208 S2_RBI_String_Save_Helper_v1.o
+                0x8000c43a                S2_RBI_String_Save_Helper_v1_main
+                0x8000c368                S2_RBI_String_Save_Helper_v1_EventHandler
+                0x8000c4b4                S2_RBI_String_Save_Helper_v1EventHandler00000
+ .text          0x8000c570     0x5836 library.o
+                0x8001075c                RotateRightLong
+                0x80010d6a                IsSystem
+                0x800106c0                Seed
+                0x8000dfb8                Remove
+                0x8001033c                Ltoa
+                0x80010068                Atoi
+                0x8000f3d0                InitRampInfoArray
+                0x80010b16                Right
+                0x80011b46                LockInputSema
+                0x800105ea                Mod
+                0x800107d2                Getc
+                0x8001051e                SMuldiv
+                0x80010d4c                IsHidden
+                0x80010402                Min
+                0x8001195a                hextosi
+                0x80010ef0                WriteIntegerArray
+                0x80011466                GetSignedIntArrayElementPtr
+                0x8000fd8a                CheckStructArray
+                0x8001196e                hextosl
+                0x80011076                WriteSignedIntegerArray
+                0x8000fa52                InitStringParamArray
+                0x8000ed24                ReadSignedLongIntegerArray
+                0x8000dc46                GatherToDelimiter
+                0x8000f876                InitStringArray
+                0x800103dc                Max
+                0x80010da6                IsReadOnly
+                0x800104e6                SMax
+                0x8000ddea                GatherByLength
+                0x80010276                Chr
+                0x80010ec8                ReadSignedLongInteger
+                0x800102f4                Itohex
+                0x8000fcfc                GetStructArrayElement
+                0x8000fff0                UNS_SetByte
+                0x80010aea                ReverseFindi
+                0x8000f1cc                ReadStringArray
+                0x80011276                GetIntArrayElementPtr
+                0x80010926                Lower
+                0x800106dc                RotateLeft
+                0x80011a8e                ResizeIfAutogrow
+                0x8000f4fc                CheckInputArray
+                0x8000cade                ResizeStringArray
+                0x80010208                Atosl
+                0x80010030                High
+                0x8001068c                Rnd
+                0x800105ae                UMod
+                0x80010732                RotateLeftLong
+                0x80011bba                FindNumericChar
+                0x800116be                CheckIOArrayBounds2
+                0x80010d04                MakeProgramFilename
+                0x80010502                SMin
+                0x8001085a                Left
+                0x8001079c                CheckBufferThreshold
+                0x80010e80                ReadSignedInteger
+                0x8001005a                LowWord
+                0x8000c570                Bit
+                0x80010e30                ReadLongInteger
+                0x8000fe6e                Byte
+                0x8001136e                GetLongArrayElementPtr
+                0x80010abc                ReverseFind
+                0x80010d1a                GetSeries
+                0x80011c86                InitTcpServer
+                0x8001090e                Len
+                0x8001178e                InitializeRampInfoInternal
+                0x80010428                Divide
+                0x80010174                Atol
+                0x80010d10                GetModelNumber
+                0x80011656                CheckIOArrayBounds
+                0x8000f556                CheckStringInputArray
+                0x80011138                WriteSignedLongIntegerArray
+                0x8000fc46                GetStringArrayElement
+                0x80010380                Ltohex
+                0x800102ac                Itoa
+                0x80010706                RotateRight
+                0x8000e2a6                InternalReverseFind
+                0x80010e10                WriteLongInteger
+                0x8000f77a                InitDynamicStringStruct
+                0x8000f66c                SetStringArray
+                0x8000eb02                ReadSignedIntegerArray
+                0x8000f5b0                SetOutputArray
+                0x80010dc0                WriteInteger
+                0x8000fbda                InitStructDynamicArray
+                0x8000e530                SetString
+                0x80010626                Random
+                0x80010e58                WriteSignedInteger
+                0x8000c7d4                Find
+                0x80010d24                GetProgramNumber
+                0x800109fa                Mid
+                0x80011bf8                InitTcpClient
+                0x8000d6c2                ResizeStructArray
+                0x8001155e                GetSignedLongArrayElementPtr
+                0x80011980                hextol
+                0x8000ef46                ReadString
+                0x8000f90c                InitDynamicStringArray
+                0x80011a66                UpperChar
+                0x80010104                Atosi
+                0x80010de8                ReadInteger
+                0x8001049a                Muldiv
+                0x8000f61e                SetStringOutputArray
+                0x800111fc                WriteString
+                0x8000d136                ResizeIntegerArray
+                0x8000f4c4                InitInOutArray
+                0x8000fb1a                InitNvramStringArray
+                0x800103c4                Abs
+                0x8001056a                SDivide
+                0x8000e6c0                ReadIntegerArray
+                0x8000c680                CompareStrings
+                0x80011a3e                LowerChar
+                0x80011d16                InitUdpSocket
+                0x80010784                ClearBuffer
+                0x80010bd2                Upper
+                0x8000fbb6                InitStructArray
+                0x80010ca8                MakeLower
+                0x80010d88                IsVolume
+                0x8000e112                RemoveByLength
+                0x8000fe06                CheckStringOutputArrayIndex
+                0x80010fb2                WriteLongIntegerArray
+                0x8001183a                InitRampInfoStructArray
+                0x8001004c                HighWord
+                0x8000c948                ResizeString
+                0x80010d2e                IsDirectory
+                0x8000e8e0                ReadLongIntegerArray
+                0x8001003e                Low
+                0x8000daec                Gather
+                0x80010cd6                MakeUpper
+                0x8000f73c                InitStringStruct
+                0x80011726                CheckStringArrayBounds
+                0x8001046c                CheckDenominator
+                0x80011942                hextoi
+                0x8000f064                WriteStringArray
+                0x8000ff2e                SetByte
+                0x800117e4                InitializeRampInfo
+                0x80011b80                UnLockInputSema
+                0x80010ea8                WriteSignedLongInteger
+                0x8000f82e                InitNvramStringStruct
+ *fill*         0x80011da6        0xa
+                0x80011db0                .=ALIGN(0x10)
+ *(.eh_frame)
+                0x80011db0                .=ALIGN(0x10)
+ *(.gnu.linkonce.t.*)
+                0x80011db0                .=ALIGN(0x4)
+                0x80011db0                __CTOR_LIST__=.
+                0x80011db0                ___CTOR_LIST__=.
+                0x80011db0        0x4 LONG 0x0 (((__CTOR_END__-__CTOR_LIST__)/0x4)-0x2)
+ *(.ctors)
+                0x80011db4        0x4 LONG 0x0
+                0x80011db8                __CTOR_END__=.
+                0x80011db8                __DTOR_LIST__=.
+                0x80011db8                ___DTOR_LIST__=.
+                0x80011db8        0x4 LONG 0x0 (((__DTOR_END__-__DTOR_LIST__)/0x4)-0x2)
+ *(.dtors)
+                0x80011dbc        0x4 LONG 0x0
+                0x80011dc0                __DTOR_END__=.
+ *(.rodata)
+ .rodata        0x80011dc0      0x932 S2_RBI_2_Series_System_Helper_Splus_v1b.o
+ .rodata        0x800126f2      0xbb9 S2_SB_Names_Controller_v1_0.o
+ .rodata        0x800132ab      0x430 S2_RBI_Dynamic_Presets_Helper_v8.o
+ .rodata        0x800136db      0x34d S2_Photocell_Proportional_Control_v1_7.o
+ .rodata        0x80013a28      0x237 S2_RBI_Motion_Logic_SPlus_v1c.o
+ .rodata        0x80013c5f      0x235 S2_RBI_String_Save_Helper_v1.o
+ .rodata        0x80013e94      0xc54 library.o
+ *(.gcc_except_table)
+                0x80014ae8                .=ALIGN(0x2)
+                0x80014ae8                __INIT_SECTION__=.
+                0x80014ae8        0x4 LONG 0x4e560000
+ *(.init)
+                0x80014aec        0x2 SHORT 0x4e5e
+                0x80014aee        0x2 SHORT 0x4e75
+                0x80014af0                __FINI_SECTION__=.
+                0x80014af0        0x4 LONG 0x4e560000
+ *(.fini)
+                0x80014af4        0x2 SHORT 0x4e5e
+                0x80014af6        0x2 SHORT 0x4e75
+ *(.lit)
+ *fill*         0x80014af8        0x8
+                0x80014b00                .=ALIGN(0x10)
+                0x80014b00                _etext=.
+                0x80014b00                etext=.
+
+.data           0x80014b00        0x0
+                0x80014b00                copy_start=.
+ *(.shdata)
+ *(.data)
+ *(.gnu.linkonce.d.*)
+                0x80014b00                .=ALIGN(0x10)
+                0x80014b00                _edata=.
+                0x80014b00                copy_end=.
+
+.got
+ *(.got.plt)
+ *(.got)
+
+EntryList       0x80014b00      0x660
+ *(EntryList)
+ EntryList      0x80014b00      0x110 S2_RBI_2_Series_System_Helper_Splus_v1b.o
+                0x80014b00                S2_RBI_2_Series_System_Helper_Splus_v1b_Entry
+ EntryList      0x80014c10      0x110 S2_SB_Names_Controller_v1_0.o
+                0x80014c10                S2_SB_Names_Controller_v1_0_Entry
+ EntryList      0x80014d20      0x110 S2_RBI_Dynamic_Presets_Helper_v8.o
+                0x80014d20                S2_RBI_Dynamic_Presets_Helper_v8_Entry
+ EntryList      0x80014e30      0x110 S2_Photocell_Proportional_Control_v1_7.o
+                0x80014e30                S2_Photocell_Proportional_Control_v1_7_Entry
+ EntryList      0x80014f40      0x110 S2_RBI_Motion_Logic_SPlus_v1c.o
+                0x80014f40                S2_RBI_Motion_Logic_SPlus_v1c_Entry
+ EntryList      0x80015050      0x110 S2_RBI_String_Save_Helper_v1.o
+                0x80015050                S2_RBI_String_Save_Helper_v1_Entry
+                0x80015160                .=ALIGN(0x4)
+
+FunctionList    0x80015160        0x4
+ *(FunctionList)
+ FunctionList   0x80015160        0x4 globals.o
+                0x80015160                g_pFunctions
+                0x80015164                .=ALIGN(0x4)
+
+.bss            0x80015164        0x0
+                0x80015164                .=ALIGN(0x4)
+                0x80015164                __bss_start=.
+ *(.shbss)
+ *(.bss)
+ *(COMMON)
+                0x80015168                _end=ALIGN(0x8)
+                0x80015168                __end=_end
+
+.stab
+ *(.stab)
+
+.stabstr
+ *(.stabstr)
+
+.debug
+ *(.debug)
+
+.line
+ *(.line)
+
+.debug_srcinfo
+ *(.debug_srcinfo)
+
+.debug_sfnames
+ *(.debug_sfnames)
+
+.debug_aranges
+ *(.debug_aranges)
+
+.debug_pubnames
+ *(.debug_pubnames)
+
+.debug_info
+ *(.debug_info)
+
+.debug_abbrev
+ *(.debug_abbrev)
+
+.debug_line
+ *(.debug_line)
+
+.debug_frame
+ *(.debug_frame)
+
+.debug_str
+ *(.debug_str)
+
+.debug_loc
+ *(.debug_loc)
+
+.debug_macinfo
+ *(.debug_macinfo)
+
+.debug_weaknames
+ *(.debug_weaknames)
+
+.debug_funcnames
+ *(.debug_funcnames)
+
+.debug_typenames
+ *(.debug_typenames)
+
+.debug_varnames
+ *(.debug_varnames)
+LOAD S2_RBI_2_Series_System_Helper_Splus_v1b.o
+LOAD S2_SB_Names_Controller_v1_0.o
+LOAD S2_RBI_Dynamic_Presets_Helper_v8.o
+LOAD S2_Photocell_Proportional_Control_v1_7.o
+LOAD S2_RBI_Motion_Logic_SPlus_v1c.o
+LOAD S2_RBI_String_Save_Helper_v1.o
+LOAD globals.o
+LOAD library.o
+OUTPUT(_S2_GE_Boardroom_GLPAC__v1b.spl elf32-m68k)
+
+.comment        0x80015164      0x130
+ .comment       0x80015164       0x26 S2_RBI_2_Series_System_Helper_Splus_v1b.o
+ .comment       0x8001518a       0x26 S2_SB_Names_Controller_v1_0.o
+ .comment       0x800151b0       0x26 S2_RBI_Dynamic_Presets_Helper_v8.o
+ .comment       0x800151d6       0x26 S2_Photocell_Proportional_Control_v1_7.o
+ .comment       0x800151fc       0x26 S2_RBI_Motion_Logic_SPlus_v1c.o
+ .comment       0x80015222       0x26 S2_RBI_String_Save_Helper_v1.o
+ .comment       0x80015248       0x26 globals.o
+ .comment       0x8001526e       0x26 library.o

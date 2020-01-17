@@ -1,0 +1,26 @@
+<Device Model="GLPAC-DIMFLV8-PM">
+   <Network Type="Cresnet" Id="01">
+      <Device Model="GLI-DIMFLV8-R" DeviceId="03"/>
+      <Device Model="GLI-PM8" DeviceId="04"/>
+      <Device Model="GL-EXP-DIMU-CN" DeviceId="05" Name="z05"/>
+      <Device Model="GL-EXP-DIMU-CN" DeviceId="06" Name="z06"/>
+      <Device Model="C2N-CBD-P" DeviceId="26" Name="scenes"/>
+      <Device Model="C2N-CBD-P" DeviceId="27" Name="scenes"/>
+      <Device Model="C2N-CBD-P" DeviceId="28" Name="scenes"/>
+      <Device Model="C2N-CBD-P" DeviceId="29" Name="scenes"/>
+      <Device Model="C2N-CBD-P" DeviceId="2A" Name="scenes"/>
+      <Device Model="C2N-CBD-P" DeviceId="2B" Name="3 zones *advanced buttons"/>
+      <Device Model="C2N-CBD-P" DeviceId="2C" Name="3 zones *advanced buttons"/>
+      <Device Model="C2N-CBD-P" DeviceId="2D" Name="4 zones *advanced buttons"/>
+      <Device Model="C2N-CBD-P" DeviceId="2E" Name="4 zones *advanced buttons"/>
+      <Device Model="C2N-CBD-P" DeviceId="2F" Name="5 zones *advanced buttons"/>
+      <Device Model="C2N-CBD-P" DeviceId="30" Name="5 zones *advanced buttons"/>
+      <Device Model="C2N-CBD-P" DeviceId="31" Name="shades"/>
+      <Device Model="C2N-CBD-P" DeviceId="32" Name="shades"/>
+      <Device Model="C2N-IO" DeviceId="A6" Name="AV"/>
+      <Device Model="C2N-IO" DeviceId="A7" Name="Shades"/>
+   </Network>
+   <Network Type="Ethernet" Id="02">
+      <Device Model="TSW-760" DeviceId="03"/>
+   </Network>
+</Device>
