@@ -369,7 +369,7 @@ LOAD S2_RBI_Motion_Logic_SPlus_v1c.o
 LOAD S2_RBI_String_Save_Helper_v1.o
 LOAD globals.o
 LOAD library.o
-OUTPUT(_S2_GE_Boardroom_GLPAC__v1b.spl elf32-m68k)
+OUTPUT(_S2_GE_Boardroom_GLPAC__v1c.spl elf32-m68k)
 
 .comment        0x80015164      0x130
  .comment       0x80015164       0x26 S2_RBI_2_Series_System_Helper_Splus_v1b.o
